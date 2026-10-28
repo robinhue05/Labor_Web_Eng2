@@ -24,9 +24,13 @@ public class TrackedObjectController {
     }
 
     // GET /api/tracked-objects
+    // optional filter: ?hazardous=true or ?hazardous=false
     @GetMapping
-    public List<TrackedObjectResponse> getAll() {
+    public List<TrackedObjectResponse> getAll(
+            @RequestParam(required = false) Boolean hazardous) {
         return service.findAll().stream()
+                // no param -> keep everything, otherwise match the flag
+                .filter(obj -> hazardous == null || obj.isPotentiallyHazardous() == hazardous)
                 .map(TrackedObjectMapper::toResponse)
                 .toList();
     }
@@ -78,15 +82,6 @@ public class TrackedObjectController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
-    }
-
-    // GET /api/tracked-objects/hazardous -> only the dangerous ones
-    @GetMapping("/hazardous")
-    public List<TrackedObjectResponse> getHazardous() {
-        return service.findAll().stream()
-                .filter(TrackedObject::isPotentiallyHazardous)
-                .map(TrackedObjectMapper::toResponse)
-                .toList();
     }
 
     // GET /api/tracked-objects/count -> just the number, e.g. 3
