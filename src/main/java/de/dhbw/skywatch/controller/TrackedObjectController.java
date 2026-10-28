@@ -51,6 +51,17 @@ public class TrackedObjectController {
                 .body(response);
     }
 
+    // PUT /api/tracked-objects/{id} -> replaces the whole object, 200 or 404
+    @PutMapping("/{id}")
+    public ResponseEntity<TrackedObjectResponse> update(
+            @PathVariable Long id,
+            @RequestBody TrackedObjectRequest request) {
+        return service.update(id, TrackedObjectMapper.toEntity(id, request))
+                .map(TrackedObjectMapper::toResponse)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     // GET /api/tracked-objects/hazardous -> only the dangerous ones
     @GetMapping("/hazardous")
     public List<TrackedObjectResponse> getHazardous() {
