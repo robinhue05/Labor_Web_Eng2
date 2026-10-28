@@ -5,6 +5,7 @@ import de.dhbw.skywatch.dto.TrackedObjectResponse;
 import de.dhbw.skywatch.mapper.TrackedObjectMapper;
 import de.dhbw.skywatch.model.TrackedObject;
 import de.dhbw.skywatch.service.TrackedObjectService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,8 +48,9 @@ public class TrackedObjectController {
     }
 
     // POST /api/tracked-objects -> 201 Created + Location header
+    // @Valid checks the request, invalid input -> 400
     @PostMapping
-    public ResponseEntity<TrackedObjectResponse> create(@RequestBody TrackedObjectRequest request) {
+    public ResponseEntity<TrackedObjectResponse> create(@Valid @RequestBody TrackedObjectRequest request) {
         TrackedObject created = service.create(TrackedObjectMapper.toEntity(request));
         TrackedObjectResponse response = TrackedObjectMapper.toResponse(created);
         // Location points to the new resource, e.g. /api/tracked-objects/4
@@ -61,7 +63,7 @@ public class TrackedObjectController {
     @PutMapping("/{id}")
     public ResponseEntity<TrackedObjectResponse> update(
             @PathVariable Long id,
-            @RequestBody TrackedObjectRequest request) {
+            @Valid @RequestBody TrackedObjectRequest request) {
         return service.update(id, TrackedObjectMapper.toEntity(request))
                 .map(TrackedObjectMapper::toResponse)
                 .map(ResponseEntity::ok)
