@@ -1,6 +1,6 @@
 # Manual API tests for the IntelliJ HTTP Client
 # start the app first, then hit the green play button next to a request
-# note: data is in-memory, restart the app to get the seed data back
+# note: H2 runs in memory, restart the app to get the seed data back
 
 ### Health check
 GET http://localhost:8080/api/health
@@ -22,6 +22,12 @@ GET http://localhost:8080/api/tracked-objects/1
 
 ### GET by id that doesn't exist (404)
 GET http://localhost:8080/api/tracked-objects/9999
+
+### Search by name, case-insensitive (finds "99942 Apophis")
+GET http://localhost:8080/api/tracked-objects/search?name=apo
+
+### Large objects only (diameter > 0.3 km)
+GET http://localhost:8080/api/tracked-objects/large
 
 ### Number of tracked objects
 GET http://localhost:8080/api/tracked-objects/count
@@ -68,6 +74,36 @@ PATCH http://localhost:8080/api/tracked-objects/3/hazardous
 ### PATCH on unknown id (404)
 PATCH http://localhost:8080/api/tracked-objects/9999/hazardous
 
+### Observations: add one for Apophis (201)
+POST http://localhost:8080/api/tracked-objects/2/observations
+Content-Type: application/json
+
+{
+  "observerName": "Robin",
+  "observedAt": "2026-10-28T21:30:00",
+  "location": "Friedrichshafen",
+  "notes": "Clear sky, faint but visible"
+}
+
+### Observations: add a second one for Apophis (201)
+POST http://localhost:8080/api/tracked-objects/2/observations
+Content-Type: application/json
+
+{
+  "observerName": "Robin",
+  "observedAt": "2026-10-29T22:15:00",
+  "location": "Ravensburg",
+  "notes": "Some clouds"
+}
+
+### Observations: list all for Apophis
+GET http://localhost:8080/api/tracked-objects/2/observations
+
+### Observations for unknown object (404)
+GET http://localhost:8080/api/tracked-objects/9999/observations
+
+# DELETE on id 2 also removes its observations (cascade + orphanRemoval)
+# check in the H2 console: SELECT * FROM OBSERVATION_SESSION;
 ### DELETE - remove an object (204)
 DELETE http://localhost:8080/api/tracked-objects/2
 
