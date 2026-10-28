@@ -40,6 +40,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problem;
     }
 
+    // 502 when NASA (or another upstream service) fails
+    @ExceptionHandler(ExternalApiException.class)
+    public ProblemDetail handleExternalApi(ExternalApiException ex) {
+        log.warn("External API call failed: {}", ex.getMessage());
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_GATEWAY, ex.getMessage());
+        problem.setTitle("Upstream service unavailable");
+        return problem;
+    }
+
     // 400 when @Valid fails - list every broken field with its message
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
