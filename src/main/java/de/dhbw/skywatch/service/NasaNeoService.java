@@ -14,12 +14,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 // Talks to the NASA NEO feed API
 @Service
@@ -29,6 +32,19 @@ public class NasaNeoService {
 
     // NASA's feed only allows up to 7 days per request
     private static final int MAX_RANGE_DAYS = 7;
+
+    // answers per day are cached for 5 minutes so we don't spam NASA (DEMO_KEY has a low limit)
+    private static final Duration CACHE_TTL = Duration.ofMinutes(5);
+
+    // one cached answer + when we got it
+    private record CacheEntry(List<NeoObject> objects, Instant fetchedAt) {
+        boolean isExpired() {
+            return fetchedAt.plus(CACHE_TTL).isBefore(Instant.now());
+        }
+    }
+
+    // thread-safe, several requests can hit the cache at the same time
+    private final Map<LocalDate, CacheEntry> cache = new ConcurrentHashMap<>();
 
     private final RestClient nasaRestClient;
     private final String apiKey;
@@ -47,8 +63,17 @@ public class NasaNeoService {
             backoff = @Backoff(delay = 500, multiplier = 2.0)
     )
     public List<NeoObject> fetchObjectsForDate(LocalDate date) {
-        return fetchFeed(date, date)
+        CacheEntry cached = cache.get(date);
+        if (cached != null && !cached.isExpired()) {
+            log.info("Cache hit for {}, not calling NASA", date);
+            return cached.objects();
+        }
+
+        List<NeoObject> objects = fetchFeed(date, date)
                 .getOrDefault(date.toString(), Collections.emptyList());
+        // only successful answers end up here, errors are never cached
+        cache.put(date, new CacheEntry(objects, Instant.now()));
+        return objects;
     }
 
     // all asteroids between start and end (both included), sorted by day
