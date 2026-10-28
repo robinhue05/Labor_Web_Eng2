@@ -1,10 +1,11 @@
 package de.dhbw.skywatch.controller;
 
+import de.dhbw.skywatch.dto.TrackedObjectResponse;
+import de.dhbw.skywatch.mapper.TrackedObjectMapper;
 import de.dhbw.skywatch.model.TrackedObject;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import de.dhbw.skywatch.service.TrackedObjectService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -13,36 +14,36 @@ import java.util.List;
 @RequestMapping("/api/tracked-objects")
 public class TrackedObjectController {
 
-    // hardcoded for now, gets replaced by real data later (session 5/6)
-    private final List<TrackedObject> trackedObjects = List.of(
-            new TrackedObject(1L, "2024 YR4", 0.07, false,
-                    "2032-12-22", 3_200_000.0),
-            new TrackedObject(2L, "99942 Apophis", 0.37, true,
-                    "2029-04-13", 31_000.0),
-            new TrackedObject(3L, "Bennu", 0.49, true,
-                    "2182-09-25", 750_000.0)
-    );
+    private final TrackedObjectService service;
+
+    // constructor injection - Spring passes in the service bean
+    public TrackedObjectController(TrackedObjectService service) {
+        this.service = service;
+    }
 
     // GET /api/tracked-objects
     @GetMapping
-    public List<TrackedObject> getAll() {
-        return trackedObjects;
+    public List<TrackedObjectResponse> getAll() {
+        return service.findAll().stream()
+                .map(TrackedObjectMapper::toResponse)
+                .toList();
     }
 
-    // GET /api/tracked-objects/{id}
+    // GET /api/tracked-objects/{id} -> 200 or 404
     @GetMapping("/{id}")
-    public TrackedObject getById(@PathVariable Long id) {
-        return trackedObjects.stream()
-                .filter(obj -> obj.getId().equals(id))
-                .findFirst()
-                .orElse(null); // TODO: proper 404 via exception handling (session 7)
+    public ResponseEntity<TrackedObjectResponse> getById(@PathVariable Long id) {
+        return service.findById(id)
+                .map(TrackedObjectMapper::toResponse)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     // GET /api/tracked-objects/hazardous -> only the dangerous ones
     @GetMapping("/hazardous")
-    public List<TrackedObject> getHazardous() {
-        return trackedObjects.stream()
+    public List<TrackedObjectResponse> getHazardous() {
+        return service.findAll().stream()
                 .filter(TrackedObject::isPotentiallyHazardous)
+                .map(TrackedObjectMapper::toResponse)
                 .toList();
     }
 
@@ -50,6 +51,6 @@ public class TrackedObjectController {
     // (fixed paths like /count win over /{id}, so no conflict here)
     @GetMapping("/count")
     public int count() {
-        return trackedObjects.size();
+        return service.findAll().size();
     }
 }
