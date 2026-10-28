@@ -11,6 +11,9 @@ import java.util.Optional;
 @Service
 public class TrackedObjectService {
 
+    // everything above this diameter counts as "large"
+    private static final double LARGE_DIAMETER_KM = 0.3;
+
     private final TrackedObjectRepository repository;
 
     public TrackedObjectService(TrackedObjectRepository repository) {
@@ -29,6 +32,11 @@ public class TrackedObjectService {
     // case-insensitive name search, "apo" finds "99942 Apophis"
     public List<TrackedObject> searchByName(String namePart) {
         return repository.findByNameContainingIgnoreCase(namePart);
+    }
+
+    // all objects with diameter > 0.3 km
+    public List<TrackedObject> findLarge() {
+        return repository.findLargerThan(LARGE_DIAMETER_KM);
     }
 
     public Optional<TrackedObject> findById(Long id) {

@@ -94,6 +94,14 @@ public class TrackedObjectController {
                 .toList();
     }
 
+    // GET /api/tracked-objects/large -> diameter > 0.3 km
+    @GetMapping("/large")
+    public List<TrackedObjectResponse> getLarge() {
+        return service.findLarge().stream()
+                .map(TrackedObjectMapper::toResponse)
+                .toList();
+    }
+
     // GET /api/tracked-objects/count -> just the number, e.g. 3
     // (fixed paths like /count win over /{id}, so no conflict here)
     @GetMapping("/count")
