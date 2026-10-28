@@ -54,6 +54,16 @@ public class TrackedObjectService {
         return Optional.of(entity);
     }
 
+    // flips potentiallyHazardous (true <-> false), empty if the id doesn't exist
+    public Optional<TrackedObject> toggleHazardous(Long id) {
+        // computeIfPresent keeps this atomic with parallel requests
+        TrackedObject updated = store.computeIfPresent(id, (key, obj) -> {
+            obj.setPotentiallyHazardous(!obj.isPotentiallyHazardous());
+            return obj;
+        });
+        return Optional.ofNullable(updated);
+    }
+
     // true if something was actually deleted
     public boolean delete(Long id) {
         return store.remove(id) != null;
