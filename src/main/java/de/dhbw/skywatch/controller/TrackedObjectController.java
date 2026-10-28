@@ -28,9 +28,11 @@ public class TrackedObjectController {
     @GetMapping
     public List<TrackedObjectResponse> getAll(
             @RequestParam(required = false) Boolean hazardous) {
-        return service.findAll().stream()
-                // no param -> keep everything, otherwise match the flag
-                .filter(obj -> hazardous == null || obj.isPotentiallyHazardous() == hazardous)
+        // no param -> everything, otherwise let the database filter
+        List<TrackedObject> objects = (hazardous == null)
+                ? service.findAll()
+                : service.findByHazardous(hazardous);
+        return objects.stream()
                 .map(TrackedObjectMapper::toResponse)
                 .toList();
     }
@@ -47,7 +49,7 @@ public class TrackedObjectController {
     // POST /api/tracked-objects -> 201 Created + Location header
     @PostMapping
     public ResponseEntity<TrackedObjectResponse> create(@RequestBody TrackedObjectRequest request) {
-        TrackedObject created = service.create(TrackedObjectMapper.toEntity(null, request));
+        TrackedObject created = service.create(TrackedObjectMapper.toEntity(request));
         TrackedObjectResponse response = TrackedObjectMapper.toResponse(created);
         // Location points to the new resource, e.g. /api/tracked-objects/4
         return ResponseEntity
@@ -60,7 +62,7 @@ public class TrackedObjectController {
     public ResponseEntity<TrackedObjectResponse> update(
             @PathVariable Long id,
             @RequestBody TrackedObjectRequest request) {
-        return service.update(id, TrackedObjectMapper.toEntity(id, request))
+        return service.update(id, TrackedObjectMapper.toEntity(request))
                 .map(TrackedObjectMapper::toResponse)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -87,7 +89,7 @@ public class TrackedObjectController {
     // GET /api/tracked-objects/count -> just the number, e.g. 3
     // (fixed paths like /count win over /{id}, so no conflict here)
     @GetMapping("/count")
-    public int count() {
-        return service.findAll().size();
+    public long count() {
+        return service.count();
     }
 }

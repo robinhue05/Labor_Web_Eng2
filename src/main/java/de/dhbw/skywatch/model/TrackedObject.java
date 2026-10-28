@@ -23,10 +23,9 @@ public class TrackedObject {
     // JPA needs a no-args constructor, protected is enough
     protected TrackedObject() {}
 
-    public TrackedObject(Long id, String name, double estimatedDiameterKm,
+    public TrackedObject(String name, double estimatedDiameterKm,
                          boolean potentiallyHazardous, String closeApproachDate,
                          double missDistanceKm) {
-        this.id = id;
         this.name = name;
         this.estimatedDiameterKm = estimatedDiameterKm;
         this.potentiallyHazardous = potentiallyHazardous;
@@ -34,10 +33,10 @@ public class TrackedObject {
         this.missDistanceKm = missDistanceKm;
     }
 
-    // getters + setters (Jackson uses the getters for the JSON output)
+    // getters + setters
+    // no setter for id on purpose, only the database writes it
 
     public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }

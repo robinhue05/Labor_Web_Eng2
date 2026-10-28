@@ -1,71 +1,70 @@
 package de.dhbw.skywatch.service;
 
 import de.dhbw.skywatch.model.TrackedObject;
+import de.dhbw.skywatch.repository.TrackedObjectRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
-// Business logic for tracked objects.
-// Data lives in memory for now, gets replaced by a JPA repository later.
+// Business logic for tracked objects, data now lives in the database
 @Service
 public class TrackedObjectService {
 
-    // thread-safe because Spring handles requests in parallel
-    private final ConcurrentHashMap<Long, TrackedObject> store = new ConcurrentHashMap<>();
-    private final AtomicLong idGenerator = new AtomicLong(1);
+    private final TrackedObjectRepository repository;
 
-    public TrackedObjectService() {
-        // some seed data so we have something to play with
-        create(new TrackedObject(null, "2024 YR4", 0.07, false,
-                "2032-12-22", 3_200_000.0));
-        create(new TrackedObject(null, "99942 Apophis", 0.37, true,
-                "2029-04-13", 31_000.0));
-        create(new TrackedObject(null, "Bennu", 0.49, true,
-                "2182-09-25", 750_000.0));
+    public TrackedObjectService(TrackedObjectRepository repository) {
+        this.repository = repository;
     }
 
     public List<TrackedObject> findAll() {
-        // copy so callers can't mess with our store
-        return List.copyOf(store.values());
+        return repository.findAll();
+    }
+
+    // true -> only hazardous ones, false -> only harmless ones
+    public List<TrackedObject> findByHazardous(boolean hazardous) {
+        return repository.findByPotentiallyHazardous(hazardous);
     }
 
     public Optional<TrackedObject> findById(Long id) {
-        return Optional.ofNullable(store.get(id));
+        return repository.findById(id);
     }
 
-    // gives the object a new id and saves it
+    public long count() {
+        return repository.count();
+    }
+
+    // save() does an INSERT here because the id is still null
     public TrackedObject create(TrackedObject entity) {
-        Long newId = idGenerator.getAndIncrement();
-        entity.setId(newId);
-        store.put(newId, entity);
-        return entity;
+        return repository.save(entity);
     }
 
-    // replaces the whole object, empty if the id doesn't exist
-    public Optional<TrackedObject> update(Long id, TrackedObject entity) {
-        if (!store.containsKey(id)) {
-            return Optional.empty();
-        }
-        entity.setId(id);
-        store.put(id, entity);
-        return Optional.of(entity);
+    // copy all fields onto the existing row, empty if the id doesn't exist
+    public Optional<TrackedObject> update(Long id, TrackedObject updated) {
+        return repository.findById(id).map(existing -> {
+            existing.setName(updated.getName());
+            existing.setEstimatedDiameterKm(updated.getEstimatedDiameterKm());
+            existing.setPotentiallyHazardous(updated.isPotentiallyHazardous());
+            existing.setCloseApproachDate(updated.getCloseApproachDate());
+            existing.setMissDistanceKm(updated.getMissDistanceKm());
+            return repository.save(existing);
+        });
     }
 
     // flips potentiallyHazardous (true <-> false), empty if the id doesn't exist
     public Optional<TrackedObject> toggleHazardous(Long id) {
-        // computeIfPresent keeps this atomic with parallel requests
-        TrackedObject updated = store.computeIfPresent(id, (key, obj) -> {
+        return repository.findById(id).map(obj -> {
             obj.setPotentiallyHazardous(!obj.isPotentiallyHazardous());
-            return obj;
+            return repository.save(obj);
         });
-        return Optional.ofNullable(updated);
     }
 
     // true if something was actually deleted
     public boolean delete(Long id) {
-        return store.remove(id) != null;
+        if (!repository.existsById(id)) {
+            return false;
+        }
+        repository.deleteById(id);
+        return true;
     }
 }
