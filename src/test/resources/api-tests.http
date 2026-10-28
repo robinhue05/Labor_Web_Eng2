@@ -1,5 +1,6 @@
 # Manual API tests for the IntelliJ HTTP Client
 # start the app first, then hit the green play button next to a request
+# note: data is in-memory, restart the app to get the seed data back
 
 ### Health check
 GET http://localhost:8080/api/health
@@ -7,14 +8,68 @@ GET http://localhost:8080/api/health
 ### API info
 GET http://localhost:8080/api/info
 
-### All tracked objects
+### GET all
 GET http://localhost:8080/api/tracked-objects
 
-### Tracked object by id
-GET http://localhost:8080/api/tracked-objects/2
+### GET only hazardous ones (filter)
+GET http://localhost:8080/api/tracked-objects?hazardous=true
 
-### Only hazardous objects
-GET http://localhost:8080/api/tracked-objects/hazardous
+### GET only harmless ones (filter)
+GET http://localhost:8080/api/tracked-objects?hazardous=false
+
+### GET by id (200)
+GET http://localhost:8080/api/tracked-objects/1
+
+### GET by id that doesn't exist (404)
+GET http://localhost:8080/api/tracked-objects/9999
 
 ### Number of tracked objects
 GET http://localhost:8080/api/tracked-objects/count
+
+### POST - create a new object (201 + Location header)
+POST http://localhost:8080/api/tracked-objects
+Content-Type: application/json
+
+{
+  "name": "Eros",
+  "estimatedDiameterKm": 16.84,
+  "potentiallyHazardous": false,
+  "closeApproachDate": "2056-01-25",
+  "missDistanceKm": 27000000.0
+}
+
+### PUT - replace the whole object (200)
+PUT http://localhost:8080/api/tracked-objects/1
+Content-Type: application/json
+
+{
+  "name": "2024 YR4 (revised)",
+  "estimatedDiameterKm": 0.09,
+  "potentiallyHazardous": true,
+  "closeApproachDate": "2032-12-22",
+  "missDistanceKm": 3200000.0
+}
+
+### PUT on unknown id (404)
+PUT http://localhost:8080/api/tracked-objects/9999
+Content-Type: application/json
+
+{
+  "name": "Ghost",
+  "estimatedDiameterKm": 1.0,
+  "potentiallyHazardous": false,
+  "closeApproachDate": "2050-01-01",
+  "missDistanceKm": 1000000.0
+}
+
+### PATCH - toggle hazardous flag (200), run twice to flip it back
+PATCH http://localhost:8080/api/tracked-objects/3/hazardous
+
+### PATCH on unknown id (404)
+PATCH http://localhost:8080/api/tracked-objects/9999/hazardous
+
+### DELETE - remove an object (204)
+DELETE http://localhost:8080/api/tracked-objects/2
+
+### DELETE again - already gone (404)
+DELETE http://localhost:8080/api/tracked-objects/2
