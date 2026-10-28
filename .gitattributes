@@ -1,0 +1,3 @@
+# keep line endings per OS so the wrapper scripts work on Linux/Mac and Windows
+/mvnw text eol=lf
+*.cmd text eol=crlf

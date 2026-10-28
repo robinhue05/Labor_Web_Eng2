@@ -1,0 +1,28 @@
+# Build-Ausgaben
+target/
+build/
+node_modules/
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDE-Dateien
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.sts4-cache
+.classpath
+.project
+.settings
+.springBeans
+
+# Umgebungsvariablen
+.env
+.env.local
+
+# Betriebssystem
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
