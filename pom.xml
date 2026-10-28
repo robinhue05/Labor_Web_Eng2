@@ -25,6 +25,20 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
+		<!-- JPA + Hibernate for talking to the database -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+
+		<!-- H2 in-memory database for development, only needed at runtime -->
+		<!-- (in Spring Boot 3 the H2 console is included, no extra h2console dependency needed) -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
 		<!-- JUnit 5, Mockito, AssertJ - only used in tests -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
