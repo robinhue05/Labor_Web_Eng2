@@ -32,6 +32,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problem;
     }
 
+    // same for observations
+    @ExceptionHandler(ObservationNotFoundException.class)
+    public ProblemDetail handleObservationNotFound(ObservationNotFoundException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setTitle("Resource not found");
+        return problem;
+    }
+
     // 400 when @Valid fails - list every broken field with its message
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
