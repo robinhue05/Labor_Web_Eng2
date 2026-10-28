@@ -62,6 +62,15 @@ public class TrackedObjectController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // PATCH /api/tracked-objects/{id}/hazardous -> toggles the hazardous flag, 200 or 404
+    @PatchMapping("/{id}/hazardous")
+    public ResponseEntity<TrackedObjectResponse> toggleHazardous(@PathVariable Long id) {
+        return service.toggleHazardous(id)
+                .map(TrackedObjectMapper::toResponse)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     // DELETE /api/tracked-objects/{id} -> 204 No Content, or 404 if it's already gone
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
