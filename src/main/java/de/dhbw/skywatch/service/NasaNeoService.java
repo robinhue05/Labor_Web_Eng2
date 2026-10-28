@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
@@ -38,12 +40,24 @@ public class NasaNeoService {
     }
 
     // all asteroids NASA lists for one day
+    // up to 3 tries if NASA fails: wait 500 ms, then 1 s (GET is idempotent, so retrying is safe)
+    @Retryable(
+            retryFor = ExternalApiException.class,
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 500, multiplier = 2.0)
+    )
     public List<NeoObject> fetchObjectsForDate(LocalDate date) {
         return fetchFeed(date, date)
                 .getOrDefault(date.toString(), Collections.emptyList());
     }
 
     // all asteroids between start and end (both included), sorted by day
+    // same retry rules, a bad range is not retried (different exception)
+    @Retryable(
+            retryFor = ExternalApiException.class,
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 500, multiplier = 2.0)
+    )
     public List<NeoObject> fetchObjectsForRange(LocalDate start, LocalDate end) {
         if (end.isBefore(start)) {
             throw new InvalidDateRangeException("end must not be before start");
