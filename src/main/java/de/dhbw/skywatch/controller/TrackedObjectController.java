@@ -45,4 +45,11 @@ public class TrackedObjectController {
                 .filter(TrackedObject::isPotentiallyHazardous)
                 .toList();
     }
+
+    // GET /api/tracked-objects/count -> just the number, e.g. 3
+    // (fixed paths like /count win over /{id}, so no conflict here)
+    @GetMapping("/count")
+    public int count() {
+        return trackedObjects.size();
+    }
 }
