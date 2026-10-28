@@ -1,5 +1,6 @@
 package de.dhbw.skywatch.controller;
 
+import de.dhbw.skywatch.dto.TrackedObjectRequest;
 import de.dhbw.skywatch.dto.TrackedObjectResponse;
 import de.dhbw.skywatch.mapper.TrackedObjectMapper;
 import de.dhbw.skywatch.model.TrackedObject;
@@ -7,6 +8,7 @@ import de.dhbw.skywatch.service.TrackedObjectService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 // REST endpoints for tracked asteroids, all under /api/tracked-objects
@@ -36,6 +38,17 @@ public class TrackedObjectController {
                 .map(TrackedObjectMapper::toResponse)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    // POST /api/tracked-objects -> 201 Created + Location header
+    @PostMapping
+    public ResponseEntity<TrackedObjectResponse> create(@RequestBody TrackedObjectRequest request) {
+        TrackedObject created = service.create(TrackedObjectMapper.toEntity(null, request));
+        TrackedObjectResponse response = TrackedObjectMapper.toResponse(created);
+        // Location points to the new resource, e.g. /api/tracked-objects/4
+        return ResponseEntity
+                .created(URI.create("/api/tracked-objects/" + created.getId()))
+                .body(response);
     }
 
     // GET /api/tracked-objects/hazardous -> only the dangerous ones
