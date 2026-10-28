@@ -49,6 +49,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problem;
     }
 
+    // 400 for an invalid date range
+    @ExceptionHandler(InvalidDateRangeException.class)
+    public ProblemDetail handleInvalidDateRange(InvalidDateRangeException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        problem.setTitle("Invalid date range");
+        return problem;
+    }
+
     // 400 when @Valid fails - list every broken field with its message
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
