@@ -6,6 +6,7 @@ import de.dhbw.skywatch.mapper.TrackedObjectMapper;
 import de.dhbw.skywatch.model.TrackedObject;
 import de.dhbw.skywatch.service.TrackedObjectService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,13 +39,10 @@ public class TrackedObjectController {
                 .toList();
     }
 
-    // GET /api/tracked-objects/{id} -> 200 or 404
+    // GET /api/tracked-objects/{id} -> 200, unknown id -> 404 via exception handler
     @GetMapping("/{id}")
-    public ResponseEntity<TrackedObjectResponse> getById(@PathVariable Long id) {
-        return service.findById(id)
-                .map(TrackedObjectMapper::toResponse)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public TrackedObjectResponse getById(@PathVariable Long id) {
+        return TrackedObjectMapper.toResponse(service.getOrThrow(id));
     }
 
     // POST /api/tracked-objects -> 201 Created + Location header
@@ -61,31 +59,25 @@ public class TrackedObjectController {
 
     // PUT /api/tracked-objects/{id} -> replaces the whole object, 200 or 404
     @PutMapping("/{id}")
-    public ResponseEntity<TrackedObjectResponse> update(
+    public TrackedObjectResponse update(
             @PathVariable Long id,
             @Valid @RequestBody TrackedObjectRequest request) {
-        return service.update(id, TrackedObjectMapper.toEntity(request))
-                .map(TrackedObjectMapper::toResponse)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        TrackedObject updated = service.update(id, TrackedObjectMapper.toEntity(request));
+        return TrackedObjectMapper.toResponse(updated);
     }
 
     // PATCH /api/tracked-objects/{id}/hazardous -> toggles the hazardous flag, 200 or 404
     @PatchMapping("/{id}/hazardous")
-    public ResponseEntity<TrackedObjectResponse> toggleHazardous(@PathVariable Long id) {
-        return service.toggleHazardous(id)
-                .map(TrackedObjectMapper::toResponse)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public TrackedObjectResponse toggleHazardous(@PathVariable Long id) {
+        return TrackedObjectMapper.toResponse(service.toggleHazardous(id));
     }
 
     // DELETE /api/tracked-objects/{id} -> 204 No Content, or 404 if it's already gone
+    // @ResponseStatus sets the default status, so no ResponseEntity needed
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (service.delete(id)) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        service.delete(id);
     }
 
     // GET /api/tracked-objects/search?name=apo
