@@ -62,6 +62,15 @@ public class TrackedObjectController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // DELETE /api/tracked-objects/{id} -> 204 No Content, or 404 if it's already gone
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        if (service.delete(id)) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+
     // GET /api/tracked-objects/hazardous -> only the dangerous ones
     @GetMapping("/hazardous")
     public List<TrackedObjectResponse> getHazardous() {
