@@ -86,6 +86,14 @@ public class TrackedObjectController {
         return ResponseEntity.notFound().build();
     }
 
+    // GET /api/tracked-objects/search?name=apo
+    @GetMapping("/search")
+    public List<TrackedObjectResponse> search(@RequestParam String name) {
+        return service.searchByName(name).stream()
+                .map(TrackedObjectMapper::toResponse)
+                .toList();
+    }
+
     // GET /api/tracked-objects/count -> just the number, e.g. 3
     // (fixed paths like /count win over /{id}, so no conflict here)
     @GetMapping("/count")
