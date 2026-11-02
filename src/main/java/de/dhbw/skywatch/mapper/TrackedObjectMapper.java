@@ -10,10 +10,9 @@ public final class TrackedObjectMapper {
     // only static helpers, no instances needed
     private TrackedObjectMapper() {}
 
-    // request -> model, id is null for new objects
-    public static TrackedObject toEntity(Long id, TrackedObjectRequest request) {
+    // request -> model (id stays empty, the database sets it)
+    public static TrackedObject toEntity(TrackedObjectRequest request) {
         return new TrackedObject(
-                id,
                 request.name(),
                 request.estimatedDiameterKm(),
                 request.potentiallyHazardous(),
