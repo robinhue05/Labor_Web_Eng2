@@ -26,6 +26,11 @@ public class TrackedObjectService {
         return repository.findByPotentiallyHazardous(hazardous);
     }
 
+    // case-insensitive name search, "apo" finds "99942 Apophis"
+    public List<TrackedObject> searchByName(String namePart) {
+        return repository.findByNameContainingIgnoreCase(namePart);
+    }
+
     public Optional<TrackedObject> findById(Long id) {
         return repository.findById(id);
     }
