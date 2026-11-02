@@ -2,6 +2,8 @@ package de.dhbw.skywatch.repository;
 
 import de.dhbw.skywatch.model.TrackedObject;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -14,4 +16,8 @@ public interface TrackedObjectRepository extends JpaRepository<TrackedObject, Lo
 
     // derived query: WHERE LOWER(name) LIKE LOWER('%namePart%')
     List<TrackedObject> findByNameContainingIgnoreCase(String namePart);
+
+    // custom JPQL query (works on the entity, not the table)
+    @Query("SELECT t FROM TrackedObject t WHERE t.estimatedDiameterKm > :minSize")
+    List<TrackedObject> findLargerThan(@Param("minSize") double minSize);
 }
