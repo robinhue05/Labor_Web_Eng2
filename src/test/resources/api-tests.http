@@ -96,6 +96,22 @@ Content-Type: application/json
   "notes": "Some clouds"
 }
 
+### Observations: get a single one (200)
+GET http://localhost:8080/api/tracked-objects/2/observations/1
+
+### Observations: unknown observation id (404 ProblemDetail)
+GET http://localhost:8080/api/tracked-objects/2/observations/9999
+
+### Observations: invalid body - empty name, date in the future, notes too long would also fail (400)
+POST http://localhost:8080/api/tracked-objects/2/observations
+Content-Type: application/json
+
+{
+  "observerName": "",
+  "observedAt": "2099-01-01T00:00:00",
+  "location": "Friedrichshafen"
+}
+
 ### Observations: list all for Apophis
 GET http://localhost:8080/api/tracked-objects/2/observations
 
@@ -109,3 +125,36 @@ DELETE http://localhost:8080/api/tracked-objects/2
 
 ### DELETE again - already gone (404)
 DELETE http://localhost:8080/api/tracked-objects/2
+
+### Errors: POST with invalid data -> 400 with fieldErrors
+POST http://localhost:8080/api/tracked-objects
+Content-Type: application/json
+
+{
+  "name": "",
+  "estimatedDiameterKm": 0,
+  "potentiallyHazardous": false,
+  "closeApproachDate": "2030-01-01",
+  "missDistanceKm": -100
+}
+
+### Errors: PUT with wrong date format -> 400
+PUT http://localhost:8080/api/tracked-objects/1
+Content-Type: application/json
+
+{
+  "name": "2024 YR4",
+  "estimatedDiameterKm": 0.07,
+  "potentiallyHazardous": false,
+  "closeApproachDate": "22.12.2032",
+  "missDistanceKm": 3200000.0
+}
+
+### Errors: GET unknown id -> 404 ProblemDetail
+GET http://localhost:8080/api/tracked-objects/9999
+
+### Errors: DELETE unknown id -> 404 ProblemDetail
+DELETE http://localhost:8080/api/tracked-objects/9999
+
+### Errors: id is not a number -> 400 (handled by Spring, not our catch-all)
+GET http://localhost:8080/api/tracked-objects/abc
