@@ -6,6 +6,7 @@ import de.dhbw.skywatch.mapper.NeoObjectMapper;
 import de.dhbw.skywatch.mapper.TrackedObjectMapper;
 import de.dhbw.skywatch.service.NasaNeoService;
 import de.dhbw.skywatch.service.TrackedObjectService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +31,17 @@ public class NeoController {
     public List<TrackedObjectResponse> today() {
         List<NeoObject> raw = nasaService.fetchObjectsForDate(LocalDate.now());
         return raw.stream()
+                .map(NeoObjectMapper::toEntity)
+                .map(TrackedObjectMapper::toResponse)
+                .toList();
+    }
+
+    // GET /api/neo/range?start=2026-10-28&end=2026-10-30 -> max 7 days, otherwise 400
+    @GetMapping("/range")
+    public List<TrackedObjectResponse> range(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
+        return nasaService.fetchObjectsForRange(start, end).stream()
                 .map(NeoObjectMapper::toEntity)
                 .map(TrackedObjectMapper::toResponse)
                 .toList();
