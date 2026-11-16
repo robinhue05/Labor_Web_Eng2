@@ -158,3 +158,21 @@ DELETE http://localhost:8080/api/tracked-objects/9999
 
 ### Errors: id is not a number -> 400 (handled by Spring, not our catch-all)
 GET http://localhost:8080/api/tracked-objects/abc
+
+### NASA live - today's asteroids (call twice: 2nd time the log says "Cache hit")
+GET http://localhost:8080/api/neo/today
+
+### NASA live - date range, max 7 days
+GET http://localhost:8080/api/neo/range?start=2026-10-28&end=2026-10-30
+
+### NASA range too long -> 400
+GET http://localhost:8080/api/neo/range?start=2026-10-01&end=2026-10-20
+
+### NASA range end before start -> 400
+GET http://localhost:8080/api/neo/range?start=2026-10-30&end=2026-10-28
+
+### NASA import today's asteroids into our database (returns the count)
+POST http://localhost:8080/api/neo/import
+
+### Check that the imported objects are there
+GET http://localhost:8080/api/tracked-objects
