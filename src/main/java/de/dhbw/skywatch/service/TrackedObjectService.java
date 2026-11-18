@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-// Business logic for tracked objects, data now lives in the database
+// Business logic for tracked objects
 @Service
 public class TrackedObjectService {
 

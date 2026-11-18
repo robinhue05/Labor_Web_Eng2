@@ -38,7 +38,6 @@
         </dependency>
 
         <!-- H2 in-memory database for development, only needed at runtime -->
-        <!-- (in Spring Boot 3 the H2 console is included, no extra h2console dependency needed) -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -46,7 +45,7 @@
         </dependency>
 
         <!-- OpenAPI docs + Swagger UI at /swagger-ui.html -->
-        <!-- 2.8.8 is the last version built for Spring Boot 3.4 (2.6.0 breaks with Boot 3.4) -->
+        <!-- 2.8.x is the line that matches Spring Boot 3.4 -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
