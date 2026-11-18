@@ -1,6 +1,6 @@
 # SkyWatch
 
-Referenzprojekt aus Web-Engineering 2 (DHBW): Überwachung erdnaher Asteroiden (Near-Earth Objects).
+REST-API mit Spring Boot zur Überwachung erdnaher Asteroiden. Die Daten kommen von der NASA NEO API.
 
 ## Starten
 
@@ -10,28 +10,14 @@ Voraussetzung: Java 21
 ./mvnw spring-boot:run
 ```
 
-Dann http://localhost:8080 öffnen. Eine "Whitelabel Error Page" bedeutet: Die App läuft (es gibt nur noch keine Endpoints).
+Die API läuft dann unter http://localhost:8080, die Swagger UI unter http://localhost:8080/swagger-ui.html.
 
-## Nützliche Links (App muss laufen)
-
-- Swagger UI: http://localhost:8080/swagger-ui.html
-- H2-Konsole: http://localhost:8080/h2-console (JDBC URL `jdbc:h2:mem:skywatch`, User `sa`, kein Passwort)
-
-## NASA API-Key
-
-Ohne Einstellung wird der `DEMO_KEY` genutzt (wenige Anfragen pro Stunde).
-Eigenen Key kostenlos auf https://api.nasa.gov holen und als Umgebungsvariable setzen, **nie ins Repo committen**:
+Optional einen eigenen NASA API-Key setzen, sonst wird der `DEMO_KEY` genutzt:
 
 ```bash
 NASA_API_KEY=dein_key ./mvnw spring-boot:run
 ```
 
-In IntelliJ: Run Configuration → Environment variables → `NASA_API_KEY=dein_key`
+## Hinweis
 
-## Tech-Stack
-
-- Spring Boot 3.4 (Java 21, Maven)
-- Spring Data JPA mit H2 (In-Memory-Datenbank)
-- Bean Validation, ProblemDetail (RFC 7807) für Fehler
-- springdoc / Swagger UI
-- NASA NEO API über RestClient, mit Spring Retry und Cache
+Aus Transparenzgründen: Am Ende des Projekts wurde Claude (KI-Assistent von Anthropic) genutzt, um das Repo aufzuräumen, also Kommentare zu vereinheitlichen, den Code einheitlich zu formatieren und dieses README zu überarbeiten.
