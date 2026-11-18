@@ -1,84 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<!-- Spring Boot parent manages all dependency versions for us -->
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.13</version>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
-	<groupId>de.dhbw</groupId>
-	<artifactId>skywatch</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>skywatch</name>
-	<description>SkyWatch - Ueberwachung erdnaher Asteroiden (Web-Engineering 2, DHBW)</description>
-	<properties>
-		<!-- we target Java 21 (LTS) -->
-		<java.version>21</java.version>
-	</properties>
-	<dependencies>
-		<!-- REST controllers, JSON (Jackson) and embedded Tomcat -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <!-- Spring Boot parent manages all dependency versions for us -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.13</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>de.dhbw</groupId>
+    <artifactId>skywatch</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>skywatch</name>
+    <description>SkyWatch - Ueberwachung erdnaher Asteroiden (Web-Engineering 2, DHBW)</description>
+    <properties>
+        <!-- we target Java 21 (LTS) -->
+        <java.version>21</java.version>
+    </properties>
+    <dependencies>
+        <!-- REST controllers, JSON (Jackson) and embedded Tomcat -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
 
-		<!-- Bean Validation (@NotBlank, @Positive, ...) via Hibernate Validator -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-validation</artifactId>
-		</dependency>
+        <!-- Bean Validation (@NotBlank, @Positive, ...) via Hibernate Validator -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
 
-		<!-- JPA + Hibernate for talking to the database -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
+        <!-- JPA + Hibernate for talking to the database -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
 
-		<!-- H2 in-memory database for development, only needed at runtime -->
-		<!-- (in Spring Boot 3 the H2 console is included, no extra h2console dependency needed) -->
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>runtime</scope>
-		</dependency>
+        <!-- H2 in-memory database for development, only needed at runtime -->
+        <!-- (in Spring Boot 3 the H2 console is included, no extra h2console dependency needed) -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 
-		<!-- OpenAPI docs + Swagger UI at /swagger-ui.html -->
-		<!-- 2.8.8 is the last version built for Spring Boot 3.4 (2.6.0 breaks with Boot 3.4) -->
-		<dependency>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>2.8.8</version>
-		</dependency>
+        <!-- OpenAPI docs + Swagger UI at /swagger-ui.html -->
+        <!-- 2.8.8 is the last version built for Spring Boot 3.4 (2.6.0 breaks with Boot 3.4) -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.8.8</version>
+        </dependency>
 
-		<!-- Spring Retry: @Retryable for calls to NASA, needs AOP (spring-aspects) to work -->
-		<dependency>
-			<groupId>org.springframework.retry</groupId>
-			<artifactId>spring-retry</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-aspects</artifactId>
-		</dependency>
+        <!-- Spring Retry: @Retryable for calls to NASA, needs AOP (spring-aspects) to work -->
+        <dependency>
+            <groupId>org.springframework.retry</groupId>
+            <artifactId>spring-retry</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aspects</artifactId>
+        </dependency>
 
-		<!-- JUnit 5, Mockito, AssertJ - only used in tests -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+        <!-- JUnit 5, Mockito, AssertJ - only used in tests -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
-	<build>
-		<plugins>
-			<!-- adds "mvn spring-boot:run" and builds an executable jar -->
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
+    <build>
+        <plugins>
+            <!-- adds "mvn spring-boot:run" and builds an executable jar -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

@@ -7,9 +7,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class SkywatchApplicationTests {
 
-	@Test
-	void contextLoads() {
-		// nothing to do here, starting the context is the test
-	}
+    @Test
+    void contextLoads() {
+        // nothing to do here, starting the context is the test
+    }
 
 }
